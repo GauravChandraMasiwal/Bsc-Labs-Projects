@@ -1,0 +1,186 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt]{article}
+
+\usepackage{pdfpages}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsthm}
+\begin{document}
+
+%\section{Methodology}
+\begin{algorithm}
+  \caption{Euler Method}
+  \begin{algorithmic}
+\State import numpy as np
+\State {def euler(ini\_cond,inde\_f,func,Nf = 10E5,tol = 0.5*10E-3):}\\
+  \Comment inde\_f is the final value of independent variable
+  
+   \State time\_vect = np.array([ini\_cond[0]]dtype=np.float64) ; a = [ ] 
+    \For {i in range(1,len(ini\_cond)):}
+    
+   \State a.append([ini\_cond[i]])
+   \EndFor
+   
+    \State y\_vect = np.array(a,dtype=np.float64);N = 30;trial = 0\\
+    \Comment initial value of N,we'll then change it such that tolerance is achieved
+     \Comment if somehow tolerence couldn't achieved then we'll chnge its value
+    \While {N $\leq$ Nf :} 
+     \State nlist = np.array([ ])       
+      \Comment we will append the final dependent values for N and 2*N in nlist array\\
+       \For {i in range(N,2*N +1,N):}  
+       \Comment i have only 2 possible values i.e N and 2*N
+        \State y = y\_vect ;t = time\_vect
+            \For {j in range(i):}
+              \State  H = abs((inde\_f - ini\_cond[0])/(i))   
+              \Comment H would be different for N and 2*N
+             \State m1\_vect = H*func(t,y)
+              \State t = t + H; y = y + m1\_vect 
+               \EndFor
+                          
+           \State nlist = np.append(nlist,y)
+           
+           \Comment we will append the final values for N and 2*N in this array
+           \EndFor
+            \State nlist = nlist.reshape(2,len(ini\_cond)-1)         
+           
+       
+        \If {abs(max((nlist[1]-nlist[0])/nlist[1])) $\leq$ tol:}
+            
+            \State break
+          \ElsIf {abs(max((nlist[1]-nlist[0])/nlist[1])) $>$ tol and 2*N $\leq$Nf:}         
+          
+            \State N = 2*N
+        \Else :
+            \State trial = 1
+            
+           \State break
+       
+         \EndIf
+         \EndWhile
+         
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+
+\begin{algorithmic}
+     
+    \If {trial == 0 :}
+        \State h = abs((inde\_f - ini\_cond[0])/(N))  
+         \For {i in range(N):}
+            
+          \State  m1 = h*func(time\_vect[i],y\_vect[:,i])\\   
+          \Comment m1 would be a vector too
+
+           \State T = time\_vect[i] + h
+           \State t\_vect = np.append(time\_vect,T)
+           
+           
+            \State time\_vect = t\_vect
+        
+           \State y\_next = y\_vect[:,i] + m1
+            \State Y = []
+            
+            \For {j in range(len(y\_vect)):}
+               \State y = np.append(y\_vect[j],y\_next[j])
+                \State Y.append(y)
+                \EndFor
+        
+            \State y\_vect = np.array(Y,dtype=np.float64)
+    \EndFor
+        \State return [time\_vect,y\_vect]
+        
+    \Else : 
+      \State {print("ERROR!!!  tolerance value is not reached within given grid  point limit", '\textbackslash n',"CAUSE : either tolerance or grid limit is too low")}
+      
+      \EndIf
+\end{algorithmic}
+\end{algorithm}
+%\begin{document}
+
+\begin{algorithm}
+\caption{Runge Kutta(RK4) Method}
+
+\begin{algorithmic}
+\State import numpy as np
+
+\State {def rk4(ini\_cond,inde\_f,func,Nf = 10E5,tol = 0.5*10E-3):}
+    \Comment inde\_f is the final value of independent variable
+    
+    \State time\_vect = np.array([ini\_cond[0]],dtype=np.float64) ; a = [ ]
+    \For {i in range(1,len(ini\_cond)):}
+        \State a.append([ini\_cond[i]])
+        \EndFor
+    
+   \State y\_vect = np.array(a,dtype=np.float64)  ; N = 30
+    \State trial = 0
+    \While {N $\leq$ Nf :}     
+       \State  nlist = np.array([ ])     
+        \For {i in range(N,2*N +1,N):}
+            \State y = y\_vect ; t = time\_vect
+            \For {j in range(i):}
+              \State  H = abs((inde\_f - ini\_cond[0])/(i))     
+              \State  m1 = H*func(t,y)
+              \State  m2 = H*func(t+(H/2),y + (m1/2))
+               \State m3 = H*func(t+(H/2),y + (m2/2))
+               \State m4 = H*func(t+H,y+m3)
+               \State mrk4 = (1/6)*(m1 + 2*m2 + 2*m3 + m4)
+               \State t = t + H ; y = y +mrk4 \EndFor
+           \State nlist = np.append(nlist,y) \EndFor \\         
+         
+          \State nlist = nlist.reshape(2,len(ini\_cond)-1)  
+
+       
+        \If {abs(max((nlist[1]-nlist[0])/nlist[1])) $\leq$ tol:}
+              \State break
+              
+        \ElsIf {abs(max((nlist[1]-nlist[0])/nlist[1])) $>$ tol and 2*N $\leq$ Nf:}
+          \State  N = 2*N
+        \Else :
+         \State   trial =1              
+         \State  break \EndIf \EndWhile
+       
+
+    
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+
+\begin{algorithmic}
+    \If {trial == 0 :}
+      \State h = abs((inde\_f - ini\_cond[0])/(N))
+        \For {a in range(N):}
+        \State    m1\_vect = h*func(time\_vect[a],y\_vect[:,a])
+          \State  m2\_vect = h*func(time\_vect[a] + (h/2),y\_vect[:,a] + (m1\_vect/2))
+           \State m3\_vect = h*func(time\_vect[a] + (h/2),y\_vect[:,a] + (m2\_vect/2))
+         \State   m4\_vect = h*func(time\_vect[a] + h,y\_vect[:,a]+m3\_vect)
+          \State  mrk4 = (1/6)*(m1\_vect + 2*m2\_vect + 2*m3\_vect + m4\_vect)
+            
+         \State   t = time\_vect[a] + h
+         \State   t\_vect = np.append(time\_vect,t)
+          \State  time\_vect = t\_vect
+        
+         \State   y\_next = y\_vect[:,a] + mrk4
+           \State Y = []
+           
+            \For {b in range(len(y\_vect)):}
+            \State y = np.append(y\_vect[b],y\_next[b])
+             \State Y.append(y)
+             \EndFor
+        
+           \State y\_vect = np.array(Y,dtype=np.float64)
+            \EndFor
+       \State return [time\_vect,y\_vect]
+       
+      \Else :
+      \State { print("ERROR!!!  tolerance value is not reached within given grid point limit", '\textbackslash n',"CAUSE : either tolerance or grid limit is too low"}
+      
+       \EndIf
+\end{algorithmic} 
+\end{algorithm}
+\end{document}
+ 
+
